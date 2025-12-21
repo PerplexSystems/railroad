@@ -21,6 +21,19 @@
           pkgs = nixpkgs.legacyPackages.${system};
         in
         {
+          ci = pkgs.mkShell {
+            buildInputs = with pkgs; [
+              mlton
+              lunarml
+              lua
+              gnumake
+            ];
+
+
+            env.LUNARML_LIB = "${pkgs.lunarml}/lib/lunarml";
+            env.MLTON_LIB = "${pkgs.mlton}/lib";
+          };
+
           default = devenv.lib.mkShell {
             inherit inputs pkgs;
             modules = [

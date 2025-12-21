@@ -10,18 +10,16 @@ jobs:
       contents: write
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v6
 
-    - name: Install Nix
-      uses: DeterminateSystems/nix-installer-action@main
-
-    - name: Run the Magic Nix Cache
-      uses: DeterminateSystems/magic-nix-cache-action@main
+    - uses: cachix/install-nix-action@v31
+      with:
+        github_access_token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build
       run: |
-        nix develop --impure -c make
+        nix develop .#ci -c make
 
     - name: Run Tests
       run: |
-        nix develop --impure -c make test
+        nix develop .#ci -c make test

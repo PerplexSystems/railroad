@@ -1,4 +1,4 @@
-package github.com/PerplexSystems/Railroad
+package github.com/PerplexSystems/railroad
 
 require {
 }

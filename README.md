@@ -1,6 +1,6 @@
 # Railroad
 
-[![Build Status](https://github.com/PerplexSystems/Railroad/actions/workflows/build.yml/badge.svg)](https://github.com/PerplexSystems/Railroad/actions)
+[![Build Status](https://github.com/PerplexSystems/railroad/actions/workflows/build.yml/badge.svg)](https://github.com/PerplexSystems/railroad/actions)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Perplex Systems on libera.chat](https://img.shields.io/badge/libera.chat-%23perplexsystems-blue.svg)](http://webchat.freenode.net/?channels=writeas)
 
@@ -16,15 +16,15 @@ along with a built-in test runner.
 ## Installation
 
 ```sh
-$ git clone https://github.com/PerplexSystems/Railroad.git $YOUR_PROJECT/vendor/Railroad
+$ git clone https://github.com/PerplexSystems/railroad.git $YOUR_PROJECT/vendor/Railroad
 ```
 
-Then reference `vendor/Railroad/sources.mlb` on your project's `.mlb`
+Then reference `vendor/railroad/sources.mlb` on your project's `.mlb`
 file. Example:
 
 ```sml
 $(SML_LIB)/basis/basis.mlb
-lib/Railroad/sources.mlb
+lib/railroad/sources.mlb
 main.sml
 ```
 

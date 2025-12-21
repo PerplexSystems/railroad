@@ -1,2 +1,2 @@
 version = 1
-workspace.root = "src/railroad.mlb"
+workspace.root = "lib/github.com/PerplexSystems/Railroad/sources.mlb"

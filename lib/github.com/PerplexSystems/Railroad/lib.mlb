@@ -1,0 +1,10 @@
+local
+  sources.mlb
+in
+  signature CONFIGURATION
+  signature TEST
+  signature EXPECT
+  signature RAILROAD
+
+  structure Railroad
+end

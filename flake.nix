@@ -2,67 +2,51 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     devenv.url = "github:cachix/devenv";
-    addlicense.url = "github:PerplexSystems/addlicense";
   };
 
-  outputs = { self, nixpkgs, devenv, addlicense, ... } @ inputs:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      devenv,
+      ...
+    }@inputs:
     let
-      systems = [ "x86_64-linux" "x86_64-darwin" "aarch64-linux" "aarch64-darwin" ];
-      forAllSystems = f: builtins.listToAttrs (map (name: { inherit name; value = f name; }) systems);
-
-      nixpkgsFor = forAllSystems (system: import nixpkgs {
-        inherit system;
-        overlays = [ addlicense.outputs.overlays.default ];
-      });
+      forAllSystems = nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed;
     in
     {
-      packages = forAllSystems (system:
-        let
-          pkgs = nixpkgs.legacyPackages."${system}";
-        in
-        {
-          docs = pkgs.stdenv.mkDerivation {
-            name = "docs";
-            src = ./.;
-
-            installPhase = ''
-              mkdir -p $out
-
-              # remove first heading
-              sed -i '1d' README.md
-
-              # add frontmatter to markdown file, required by hugo
-              sed -i '1s/^/---\ntitle: Railroad\n---\n\n/' README.md
-
-              cp README.md $out/Railroad.md
-              cp -r docs $out/
-            '';
-          };
-        });
-
-      devShells = forAllSystems (system:
+      devShells = forAllSystems (
+        system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
         in
         {
           default = devenv.lib.mkShell {
             inherit inputs pkgs;
-            modules = [{
-              packages = with pkgs; [
-                # compilers
-                mlton
+            modules = [
+              {
+                packages = with pkgs; [
+                  # compilers
+                  mlton
+                  lunarml
+                  lua
 
-                # tools
-                addlicense.outputs.packages."${system}".default
-                millet
-                smlfmt
+                  # tools
+                  millet
+                  smlfmt
+                  smlpkg
 
-                # other
-                gnumake
-                gcc
-              ];
-            }];
+                  # other
+                  gnumake
+                  gcc
+                ];
+
+                env.LUNARML_LIB = "${pkgs.lunarml}/lib/lunarml";
+                env.MLTON_LIB = "${pkgs.mlton}/lib";
+              }
+            ];
           };
-        });
+        }
+      );
     };
 }

@@ -87,6 +87,42 @@ struct
                   (Expect.equalFmt Int.compare Int.toString expected actual)
                 end)
             ]
+        , describe "runtests"
+            [ test "stops on first failure when stopOnFirstFailure is true" (fn _ =>
+                let
+                  val output = TextIO.openOut "/dev/null"
+                  val tests = describe "three tests"
+                    [ test "first fails" (fn _ => Expect.fail "first failure")
+                    , test "second fails" (fn _ => Expect.fail "second failure")
+                    , test "third fails" (fn _ => Expect.fail "third failure")
+                    ]
+                  val runners =
+                    case fromTest tests of
+                      Plain rs => rs
+                    | _ => []
+                  val report = runtests output false true runners
+                  val _ = TextIO.closeOut output
+                in
+                  Expect.equalFmt Int.compare Int.toString 1 (#failed report)
+                end)
+            , test "runs all tests when stopOnFirstFailure is false" (fn _ =>
+                let
+                  val output = TextIO.openOut "/dev/null"
+                  val tests = describe "three tests"
+                    [ test "first fails" (fn _ => Expect.fail "first failure")
+                    , test "second fails" (fn _ => Expect.fail "second failure")
+                    , test "third fails" (fn _ => Expect.fail "third failure")
+                    ]
+                  val runners =
+                    case fromTest tests of
+                      Plain rs => rs
+                    | _ => []
+                  val report = runtests output false false runners
+                  val _ = TextIO.closeOut output
+                in
+                  Expect.equalFmt Int.compare Int.toString 3 (#failed report)
+                end)
+            ]
         , describe "todistribution"
             [ test "have a single test" (fn _ =>
                 let

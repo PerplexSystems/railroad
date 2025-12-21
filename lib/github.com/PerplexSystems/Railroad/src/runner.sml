@@ -126,9 +126,18 @@ struct
       TextIO.output (stream, output)
     end
 
-  fun runtests stream printPassed runners =
+  fun runtests stream printPassed stopOnFirstFailure runners =
     let
-      val runs = (List.map evalrunner runners)
+      fun loop [] acc = acc
+        | loop (runner :: rest) acc =
+            let
+              val run = evalrunner runner
+              val newAcc = acc @ [run]
+            in
+              if not (#passed run) andalso stopOnFirstFailure then newAcc
+              else loop rest newAcc
+            end
+      val runs = loop runners []
       val report = runreport runs
     in
       ( List.app
@@ -143,14 +152,14 @@ struct
 
   fun runWithConfig options test =
     let
-      val {output, printPassed} = Configuration.fromList options
+      val {output, printPassed, stopOnFirstFailure} = Configuration.fromList options
 
       val runners = let open Configuration in fromTest test end
     in
       case runners of
         Plain rs =>
           let
-            val report = runtests output printPassed rs
+            val report = runtests output printPassed stopOnFirstFailure rs
             val _ = printreport output report
           in
             if (#failed report) > 0 then OS.Process.exit OS.Process.failure
@@ -158,7 +167,7 @@ struct
           end
       | Skipping rs =>
           let
-            val report = runtests output printPassed rs
+            val report = runtests output printPassed stopOnFirstFailure rs
             val _ = printreport output report
           in
             (* skipping a test should always fail all the tests *)
@@ -167,7 +176,7 @@ struct
 
       | Focusing rs =>
           let
-            val report = runtests output printPassed rs
+            val report = runtests output printPassed stopOnFirstFailure rs
             val _ = printreport output report
           in
             (* focusing a test should always fail all the tests *)

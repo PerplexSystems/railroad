@@ -15,7 +15,7 @@
 *)
 
 $(SML_LIB)/basis/basis.mlb
-../lib/github.com/PerplexSystems/railroad/sources.mlb
+../src/sources.mlb
 
 src/helpers.sml
 src/expectation.sml

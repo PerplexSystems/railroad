@@ -112,7 +112,7 @@ struct
 
   fun runreport runs =
     List.foldl
-      (fn ({passed, result}, acc) =>
+      (fn ({passed, result = _}, acc) =>
          if passed then {passed = (#passed acc) + 1, failed = (#failed acc)}
          else {passed = (#passed acc), failed = (#failed acc) + 1})
       {passed = 0, failed = 0} runs

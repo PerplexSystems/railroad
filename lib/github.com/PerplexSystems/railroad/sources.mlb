@@ -1,8 +1,0 @@
-$(SML_LIB)/basis/basis.mlb
-src/configuration.sml
-src/expectation.sml
-src/internal.sml
-src/runner.sml
-src/test.sml
-src/expect.sml
-src/railroad.sml

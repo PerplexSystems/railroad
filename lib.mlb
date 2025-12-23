@@ -1,5 +1,5 @@
 local
-  sources.mlb
+  src/sources.mlb
 in
   signature CONFIGURATION
   signature TEST

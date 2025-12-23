@@ -4,9 +4,10 @@ SMLFMT = smlfmt
 LUNARML = lunarml
 LUA = lua
 
-SRC_ROOT = lib/github.com/PerplexSystems/railroad
+SRC_ROOT = src
+LIB_MLB = lib.mlb
 
-SOURCES = $(wildcard $(SRC_ROOT)/*.sml) $(wildcard $(SRC_ROOT)/*.mlb) $(wildcard $(SRC_ROOT)/**/*.sml) $(wildcard $(SRC_ROOT)/**/*.mlb)
+SOURCES = $(LIB_MLB) $(wildcard $(SRC_ROOT)/*.sml) $(wildcard $(SRC_ROOT)/*.mlb) $(wildcard $(SRC_ROOT)/**/*.sml) $(wildcard $(SRC_ROOT)/**/*.mlb)
 TESTS_SOURCES = $(SOURCES) $(wildcard tests/*.sml) $(wildcard tests/*.mlb) $(wildcard tests/**/*.sml) $(wildcard tests/**/*.mlb)
 
 all: build/mlton build/lunarml
@@ -15,10 +16,10 @@ build:
 	mkdir -p $@/test
 
 build/mlton: $(SOURCES) build
-	$(MLTON) -output $@ $(SRC_ROOT)/lib.mlb
+	$(MLTON) -output $@ $(LIB_MLB)
 
 build/lunarml: $(SOURCES) build
-	$(LUNARML) -B $$LUNARML_LIB compile --output $@ $(SRC_ROOT)/lib.mlb
+	$(LUNARML) -B $$LUNARML_LIB compile --output $@ $(LIB_MLB)
 
 build/test/mlton: $(TESTS_SOURCES) build
 	$(MLTON) -output $@ tests/tests.mlb

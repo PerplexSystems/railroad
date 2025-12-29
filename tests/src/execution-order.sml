@@ -28,7 +28,9 @@ struct
         | compareIntOption (SOME a, SOME b) = Int.compare (a, b)
 
       fun getLabels runners =
-        List.map (fn {labels, ...}: Runner.Runner => String.concatWith "." labels) runners
+        List.map
+          (fn {labels, ...}: Runner.Runner => String.concatWith "." labels)
+          runners
 
       fun makeTestRunners () =
         let

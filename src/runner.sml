@@ -9,31 +9,27 @@ struct
     String.concatWith "." (List.map Internal.String.trim labels)
 
   fun sortAlphabetically (runners: Runner list) =
-    List.mergeSort (fn (a, b) => String.compare (runnerLabel a, runnerLabel b)) runners
+    List.mergeSort (fn (a, b) => String.compare (runnerLabel a, runnerLabel b))
+      runners
 
   fun shuffle rng (runners: Runner list) =
     let
       val arr = Array.fromList runners
       val n = Array.length arr
       fun swap (i, j) =
-        let
-          val tmp = Array.sub (arr, i)
-        in
-          Array.update (arr, i, Array.sub (arr, j));
-          Array.update (arr, j, tmp)
+        let val tmp = Array.sub (arr, i)
+        in Array.update (arr, i, Array.sub (arr, j)); Array.update (arr, j, tmp)
         end
       fun loop i =
-        if i <= 0 then ()
+        if i <= 0 then
+          ()
         else
-          let
-            val j = TimeBasedRandom.randInt rng (0, i)
-          in
-            swap (i, j);
-            loop (i - 1)
+          let val j = TimeBasedRandom.randInt rng (0, i)
+          in swap (i, j); loop (i - 1)
           end
     in
       loop (n - 1);
-      Array.foldr (op ::) [] arr
+      Array.foldr (op::) [] arr
     end
 
   fun applyExecutionOrder order (runners: Runner list) =
@@ -42,7 +38,8 @@ struct
     | Configuration.AlphabeticalOrder => (sortAlphabetically runners, NONE)
     | Configuration.RandomOrder seedOpt =>
         let
-          val rng = case seedOpt of
+          val rng =
+            case seedOpt of
               SOME seed => TimeBasedRandom.randFromSeed seed
             | NONE => TimeBasedRandom.rand ()
           val initialSeed = TimeBasedRandom.getSeed rng
@@ -144,7 +141,7 @@ struct
             , focused = 0
             }
         else
-           Skipping
+          Skipping
             { runners = Internal.List.concatMap (fromRunnableTree []) all
             , skipped = skippedCount
             , focused = 0

@@ -10,20 +10,20 @@ struct
       List.concat (List.map f l)
 
     fun mergeSort _ [] = []
-    | mergeSort _ [x] = [x]
-    | mergeSort cmp xs =
-        let
-          val n = List.length xs div 2
-          val left = List.take (xs, n)
-          val right = List.drop (xs, n)
-          fun merge ([], ys) = ys
-            | merge (xs_, []) = xs_
-            | merge (x :: xs_, y :: ys) =
-                if cmp (x, y) = GREATER then y :: merge (x :: xs_, ys)
-                else x :: merge (xs_, y :: ys)
-        in
-          merge (mergeSort cmp left, mergeSort cmp right)
-        end
+      | mergeSort _ [x] = [x]
+      | mergeSort cmp xs =
+          let
+            val n = List.length xs div 2
+            val left = List.take (xs, n)
+            val right = List.drop (xs, n)
+            fun merge ([], ys) = ys
+              | merge (xs_, []) = xs_
+              | merge (x :: xs_, y :: ys) =
+                  if cmp (x, y) = GREATER then y :: merge (x :: xs_, ys)
+                  else x :: merge (xs_, y :: ys)
+          in
+            merge (mergeSort cmp left, mergeSort cmp right)
+          end
   end
 
   structure String =

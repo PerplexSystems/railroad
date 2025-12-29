@@ -23,26 +23,22 @@ struct
     in
       describe "TimeBasedRandom"
         [ describe "rand"
-            [ test "creates a random generator" (fn _ =>
-                let
-                  val _ = rand ()
-                in
-                  Expect.pass
-                end)
-            ]
+            [test "creates a random generator" (fn _ =>
+               let val _ = rand ()
+               in Expect.pass
+               end)]
         , describe "setSeed"
-            [ test "allows reproducible sequences" (fn _ =>
-                let
-                  val r1 = rand ()
-                  val r2 = rand ()
-                  val _ = setSeed r1 42
-                  val _ = setSeed r2 42
-                  val v1 = randInt r1 (0, 1000)
-                  val v2 = randInt r2 (0, 1000)
-                in
-                  Expect.equalFmt Int.compare Int.toString v1 v2
-                end)
-            ]
+            [test "allows reproducible sequences" (fn _ =>
+               let
+                 val r1 = rand ()
+                 val r2 = rand ()
+                 val _ = setSeed r1 42
+                 val _ = setSeed r2 42
+                 val v1 = randInt r1 (0, 1000)
+                 val v2 = randInt r2 (0, 1000)
+               in
+                 Expect.equalFmt Int.compare Int.toString v1 v2
+               end)]
         , describe "randInt"
             [ test "returns value within range" (fn _ =>
                 let

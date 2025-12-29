@@ -49,17 +49,37 @@ struct
     , executionOrder = RandomOrder NONE
     }
 
-  fun withOutput newOutput {output = _, printPassed, stopOnFirstFailure, executionOrder} =
-    {output = newOutput, printPassed = printPassed, stopOnFirstFailure = stopOnFirstFailure, executionOrder = executionOrder}
+  fun withOutput newOutput
+    {output = _, printPassed, stopOnFirstFailure, executionOrder} =
+    { output = newOutput
+    , printPassed = printPassed
+    , stopOnFirstFailure = stopOnFirstFailure
+    , executionOrder = executionOrder
+    }
 
-  fun withPrintPassed newPrintPassed {output, printPassed = _, stopOnFirstFailure, executionOrder} =
-    {output = output, printPassed = newPrintPassed, stopOnFirstFailure = stopOnFirstFailure, executionOrder = executionOrder}
+  fun withPrintPassed newPrintPassed
+    {output, printPassed = _, stopOnFirstFailure, executionOrder} =
+    { output = output
+    , printPassed = newPrintPassed
+    , stopOnFirstFailure = stopOnFirstFailure
+    , executionOrder = executionOrder
+    }
 
-  fun withStopOnFirstFailure newStopOnFirstFailure {output, printPassed, stopOnFirstFailure = _, executionOrder} =
-    {output = output, printPassed = printPassed, stopOnFirstFailure = newStopOnFirstFailure, executionOrder = executionOrder}
+  fun withStopOnFirstFailure newStopOnFirstFailure
+    {output, printPassed, stopOnFirstFailure = _, executionOrder} =
+    { output = output
+    , printPassed = printPassed
+    , stopOnFirstFailure = newStopOnFirstFailure
+    , executionOrder = executionOrder
+    }
 
-  fun withExecutionOrder newExecutionOrder {output, printPassed, stopOnFirstFailure, executionOrder = _} =
-    {output = output, printPassed = printPassed, stopOnFirstFailure = stopOnFirstFailure, executionOrder = newExecutionOrder}
+  fun withExecutionOrder newExecutionOrder
+    {output, printPassed, stopOnFirstFailure, executionOrder = _} =
+    { output = output
+    , printPassed = printPassed
+    , stopOnFirstFailure = stopOnFirstFailure
+    , executionOrder = newExecutionOrder
+    }
 
   fun fromList options =
     List.foldl
@@ -67,7 +87,8 @@ struct
          case setting of
            Output newOutput => withOutput newOutput config
          | PrintPassed newPrintPassed => withPrintPassed newPrintPassed config
-         | StopOnFirstFailure newStopOnFirstFailure => withStopOnFirstFailure newStopOnFirstFailure config
-         | ExecutionOrder newExecutionOrder => withExecutionOrder newExecutionOrder config)
-      default options
+         | StopOnFirstFailure newStopOnFirstFailure =>
+             withStopOnFirstFailure newStopOnFirstFailure config
+         | ExecutionOrder newExecutionOrder =>
+             withExecutionOrder newExecutionOrder config) default options
 end

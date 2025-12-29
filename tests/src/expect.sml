@@ -65,25 +65,18 @@ struct
                   , Expect.equal Int.compare 1 1
                   ])
             , test "fails when one expectation fails" (fn _ =>
-                expectToFail (Expect.all
-                  [ Expect.pass
-                  , Expect.fail "this fails"
-                  , Expect.pass
-                  ]))
+                expectToFail
+                  (Expect.all
+                     [Expect.pass, Expect.fail "this fails", Expect.pass]))
             , test "fails when all expectations fail" (fn _ =>
-                expectToFail (Expect.all
-                  [ Expect.fail "first"
-                  , Expect.fail "second"
-                  ]))
+                expectToFail
+                  (Expect.all [Expect.fail "first", Expect.fail "second"]))
             , test "fails with empty list" (fn _ =>
                 expectToFail (Expect.all []))
             ]
         , describe "any"
             [ test "passes when all expectations pass" (fn _ =>
-                Expect.any
-                  [ Expect.pass
-                  , Expect.pass
-                  ])
+                Expect.any [Expect.pass, Expect.pass])
             , test "passes when one expectation passes" (fn _ =>
                 Expect.any
                   [ Expect.fail "this fails"
@@ -91,10 +84,8 @@ struct
                   , Expect.fail "this also fails"
                   ])
             , test "fails when all expectations fail" (fn _ =>
-                expectToFail (Expect.any
-                  [ Expect.fail "first"
-                  , Expect.fail "second"
-                  ]))
+                expectToFail
+                  (Expect.any [Expect.fail "first", Expect.fail "second"]))
             , test "fails with empty list" (fn _ =>
                 expectToFail (Expect.any []))
             ]

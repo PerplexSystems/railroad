@@ -94,10 +94,11 @@ struct
 
   fun all expectations =
     case expectations of
-      [] => Expectation.fail
-        { description = "Expect.all"
-        , reason = Equality "Expect.all requires at least one expectation."
-        }
+      [] =>
+        Expectation.fail
+          { description = "Expect.all"
+          , reason = Equality "Expect.all requires at least one expectation."
+          }
     | _ =>
         case List.find (fn e => e <> Pass) expectations of
           NONE => Pass
@@ -105,10 +106,11 @@ struct
 
   fun any expectations =
     case expectations of
-      [] => Expectation.fail
-        { description = "Expect.any"
-        , reason = Equality "Expect.any requires at least one expectation."
-        }
+      [] =>
+        Expectation.fail
+          { description = "Expect.any"
+          , reason = Equality "Expect.any requires at least one expectation."
+          }
     | _ =>
         if List.exists (fn e => e = Pass) expectations then
           Pass

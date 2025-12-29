@@ -100,7 +100,7 @@ struct
                     case fromTest tests of
                       Plain rs => rs
                     | _ => []
-                  val report = runtests output false true runners
+                  val report = runtests output false true NONE runners
                   val _ = TextIO.closeOut output
                 in
                   Expect.equalFmt Int.compare Int.toString 1 (#failed report)
@@ -117,7 +117,7 @@ struct
                     case fromTest tests of
                       Plain rs => rs
                     | _ => []
-                  val report = runtests output false false runners
+                  val report = runtests output false false NONE runners
                   val _ = TextIO.closeOut output
                 in
                   Expect.equalFmt Int.compare Int.toString 3 (#failed report)

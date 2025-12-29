@@ -25,7 +25,7 @@
             buildInputs = with pkgs; [
               mlton
               lunarml
-              lua
+              lua5_3_compat
               gnumake
             ];
 

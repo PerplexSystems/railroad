@@ -1,8 +1,22 @@
 signature CONFIGURATION =
 sig
-  datatype Setting = Output of TextIO.outstream | PrintPassed of bool | StopOnFirstFailure of bool
+  datatype ExecutionOrder =
+    AlphabeticalOrder
+  | DeclarationOrder
+  | RandomOrder of int option
 
-  type Configuration = {output: TextIO.outstream, printPassed: bool, stopOnFirstFailure: bool}
+  datatype Setting =
+    Output of TextIO.outstream
+  | PrintPassed of bool
+  | StopOnFirstFailure of bool
+  | ExecutionOrder of ExecutionOrder
+
+  type Configuration =
+    { output: TextIO.outstream
+    , printPassed: bool
+    , stopOnFirstFailure: bool
+    , executionOrder: ExecutionOrder
+    }
 
   val fromList: Setting list -> Configuration
   val default: Configuration
@@ -10,20 +24,42 @@ end
 
 structure Configuration: CONFIGURATION =
 struct
-  datatype Setting = Output of TextIO.outstream | PrintPassed of bool | StopOnFirstFailure of bool
+  datatype ExecutionOrder =
+    AlphabeticalOrder
+  | DeclarationOrder
+  | RandomOrder of int option
 
-  type Configuration = {output: TextIO.outstream, printPassed: bool, stopOnFirstFailure: bool}
+  datatype Setting =
+    Output of TextIO.outstream
+  | PrintPassed of bool
+  | StopOnFirstFailure of bool
+  | ExecutionOrder of ExecutionOrder
 
-  val default = {output = TextIO.stdOut, printPassed = true, stopOnFirstFailure = false}
+  type Configuration =
+    { output: TextIO.outstream
+    , printPassed: bool
+    , stopOnFirstFailure: bool
+    , executionOrder: ExecutionOrder
+    }
 
-  fun withOutput newOutput {output = _, printPassed, stopOnFirstFailure} =
-    {output = newOutput, printPassed = printPassed, stopOnFirstFailure = stopOnFirstFailure}
+  val default =
+    { output = TextIO.stdOut
+    , printPassed = true
+    , stopOnFirstFailure = false
+    , executionOrder = RandomOrder NONE
+    }
 
-  fun withPrintPassed newPrintPassed {output, printPassed = _, stopOnFirstFailure} =
-    {output = output, printPassed = newPrintPassed, stopOnFirstFailure = stopOnFirstFailure}
+  fun withOutput newOutput {output = _, printPassed, stopOnFirstFailure, executionOrder} =
+    {output = newOutput, printPassed = printPassed, stopOnFirstFailure = stopOnFirstFailure, executionOrder = executionOrder}
 
-  fun withStopOnFirstFailure newStopOnFirstFailure {output, printPassed, stopOnFirstFailure = _} =
-    {output = output, printPassed = printPassed, stopOnFirstFailure = newStopOnFirstFailure}
+  fun withPrintPassed newPrintPassed {output, printPassed = _, stopOnFirstFailure, executionOrder} =
+    {output = output, printPassed = newPrintPassed, stopOnFirstFailure = stopOnFirstFailure, executionOrder = executionOrder}
+
+  fun withStopOnFirstFailure newStopOnFirstFailure {output, printPassed, stopOnFirstFailure = _, executionOrder} =
+    {output = output, printPassed = printPassed, stopOnFirstFailure = newStopOnFirstFailure, executionOrder = executionOrder}
+
+  fun withExecutionOrder newExecutionOrder {output, printPassed, stopOnFirstFailure, executionOrder = _} =
+    {output = output, printPassed = printPassed, stopOnFirstFailure = stopOnFirstFailure, executionOrder = newExecutionOrder}
 
   fun fromList options =
     List.foldl
@@ -31,6 +67,7 @@ struct
          case setting of
            Output newOutput => withOutput newOutput config
          | PrintPassed newPrintPassed => withPrintPassed newPrintPassed config
-         | StopOnFirstFailure newStopOnFirstFailure => withStopOnFirstFailure newStopOnFirstFailure config)
+         | StopOnFirstFailure newStopOnFirstFailure => withStopOnFirstFailure newStopOnFirstFailure config
+         | ExecutionOrder newExecutionOrder => withExecutionOrder newExecutionOrder config)
       default options
 end

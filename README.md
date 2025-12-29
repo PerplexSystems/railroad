@@ -58,6 +58,7 @@ Check out the table of contents below for more information:
     - [test](#test)
   - [Test.Configuration](#testconfiguration)
     - [Setting](#setting)
+    - [ExecutionOrder](#executionorder)
   - [Expect](#expect)
     - [actual](#actual)
     - [expected](#expected)
@@ -226,16 +227,65 @@ configuring the test runner.
 The default [`Setting`](#setting)s are the following:
 
 ```sml
-{ output = TextIO.stdOut }
+{ output = TextIO.stdOut
+, printPassed = true
+, stopOnFirstFailure = false
+, executionOrder = RandomOrder NONE
+}
 ```
 
 ### Setting
 
-`datatype Setting = Output of TextIO.outstream`
+```sml
+datatype Setting =
+    Output of TextIO.outstream
+  | PrintPassed of bool
+  | StopOnFirstFailure of bool
+  | ExecutionOrder of ExecutionOrder
+```
 
 Represents the possible settings for the runner configuration.
 
-- Output: Where the output should be redirected to.
+- `Output`: Where the output should be redirected to.
+- `PrintPassed`: Whether to print passing tests (default: `true`).
+- `StopOnFirstFailure`: Whether to stop running tests after the first failure (default: `false`).
+- `ExecutionOrder`: The order in which tests should be executed (default: `RandomOrder NONE`).
+
+### ExecutionOrder
+
+```sml
+datatype ExecutionOrder =
+    AlphabeticalOrder
+  | DeclarationOrder
+  | RandomOrder of int option
+```
+
+Controls the order in which tests are executed:
+
+- `AlphabeticalOrder`: Runs tests in alphabetical order of their descriptions (full path including parent describes).
+- `DeclarationOrder`: Runs tests in the order they were declared in the source code.
+- `RandomOrder of int option`: Runs tests in a random order. This is the default. When using `RandomOrder NONE`, a random seed is generated and printed to the output so you can reproduce the run. When using `RandomOrder (SOME seed)`, the provided seed is used for deterministic shuffling.
+
+```sml
+(* Run tests in alphabetical order *)
+runWithConfig [ ExecutionOrder AlphabeticalOrder ] tests
+
+(* Run tests in random order with auto-generated seed *)
+runWithConfig [ ExecutionOrder (RandomOrder NONE) ] tests
+
+(* Run tests in random order with a specific seed for reproducibility *)
+runWithConfig [ ExecutionOrder (RandomOrder (SOME 12345)) ] tests
+```
+
+When using `RandomOrder`, the seed will be printed at the end of the output:
+
+```
+...
+=== PASS: Expect.atMost.greater value
+
+Random seed: 948422150
+Passed: 60, failed: 0
+```
 
 ## Expect
 

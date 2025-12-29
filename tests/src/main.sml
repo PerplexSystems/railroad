@@ -18,7 +18,7 @@ structure Main =
 struct
   fun main (_: string, _: string list) =
     let open Test
-    in run (concat [TestExpect.tests, TestRunner.tests, TestExpectation.tests])
+    in run (concat [TestExpect.tests, TestRunner.tests, TestExpectation.tests, TestRandom.tests, TestExecutionOrder.tests])
     end
 end
 

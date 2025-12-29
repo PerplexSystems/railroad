@@ -21,4 +21,6 @@ src/helpers.sml
 src/expectation.sml
 src/expect.sml
 src/runner.sml
+src/random.sml
+src/execution-order.sml
 src/main.sml

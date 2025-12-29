@@ -37,8 +37,7 @@ val tests =
         Expect.equal Int.compare 2 (1 + 1))
     ]
 
-val _ =
-    run tests
+val _ = run tests
 ```
 
 Check out the table of contents below for more information:
@@ -283,8 +282,8 @@ When using `RandomOrder`, the seed will be printed at the end of the output:
 ...
 === PASS: Expect.atMost.greater value
 
-Random seed: 948422150
-Passed: 60, failed: 0
+Random seed: 1501112078
+Passed: 60, failed: 0, skipped: 0, focused: 0
 ```
 
 ## Expect

@@ -62,12 +62,15 @@ struct
     , skipped: RunnableTree list
     }
 
-  type RunReport = {passed: int, failed: int, skipped: int, seed: int option}
+  type RunReport =
+    {passed: int, failed: int, skipped: int, focused: int, seed: int option}
+
+  type RunnerResult = {runners: Runner list, skipped: int, focused: int}
 
   datatype Runners =
-    Plain of Runner list
-  | Focusing of Runner list
-  | Skipping of Runner list
+    Plain of RunnerResult
+  | Focusing of RunnerResult
+  | Skipping of RunnerResult
   | Invalid of string
 
   fun runThunk (Thunk thunk) = thunk ()
@@ -130,14 +133,28 @@ struct
           List.foldl (fn (runnable, acc) => (countrunnables runnable) + acc) 0
             trees
         end
+      val skippedCount = countallrunnables skipped
+      val focusedCount = countallrunnables focused
     in
-      if List.null focused then
-        if (countallrunnables skipped) = 0 then
-          Plain (Internal.List.concatMap (fromRunnableTree []) all)
+      if focusedCount = 0 then
+        if skippedCount = 0 then
+          Plain
+            { runners = Internal.List.concatMap (fromRunnableTree []) all
+            , skipped = 0
+            , focused = 0
+            }
         else
-          Skipping (Internal.List.concatMap (fromRunnableTree []) all)
+           Skipping
+            { runners = Internal.List.concatMap (fromRunnableTree []) all
+            , skipped = skippedCount
+            , focused = 0
+            }
       else
-        Focusing (Internal.List.concatMap (fromRunnableTree []) focused)
+        Focusing
+          { runners = Internal.List.concatMap (fromRunnableTree []) focused
+          , skipped = skippedCount
+          , focused = focusedCount
+          }
     end
 
   fun evalrunner (runner: Runner) =
@@ -155,27 +172,46 @@ struct
       {result = str ^ "\n", passed = (expectation = Pass)}
     end
 
-  fun runreport seed runs =
+  fun runreport seed {skipped, focused} runs =
     List.foldl
       (fn ({passed, result = _}, acc) =>
-         if passed then {passed = (#passed acc) + 1, failed = (#failed acc), seed = seed}
-         else {passed = (#passed acc), failed = (#failed acc) + 1, seed = seed})
-      {passed = 0, failed = 0, seed = seed} runs
+         if passed then
+           { passed = (#passed acc) + 1
+           , failed = (#failed acc)
+           , skipped = skipped
+           , focused = focused
+           , seed = seed
+           }
+         else
+           { passed = (#passed acc)
+           , failed = (#failed acc) + 1
+           , skipped = skipped
+           , focused = focused
+           , seed = seed
+           })
+      { passed = 0
+      , failed = 0
+      , skipped = skipped
+      , focused = focused
+      , seed = seed
+      } runs
 
-  fun printreport stream {passed, failed, seed} =
+  fun printreport stream {passed, failed, skipped, focused, seed} =
     let
       val seedOutput =
         case seed of
           SOME s => "Random seed: " ^ Int.toString s ^ "\n"
         | NONE => ""
       val output =
-        ("\n" ^ seedOutput ^ "Passed: " ^ Int.toString passed ^ ", failed: " ^ Int.toString failed
-         ^ "\n")
+        ("\n" ^ seedOutput ^ "Passed: " ^ Int.toString passed ^ ", failed: "
+         ^ Int.toString failed ^ ", skipped: " ^ Int.toString skipped
+         ^ ", focused: " ^ Int.toString focused ^ "\n")
     in
       TextIO.output (stream, output)
     end
 
-  fun runtests stream printPassed stopOnFirstFailure (seed: int option) runners =
+  fun runtests stream printPassed stopOnFirstFailure (seed: int option) counts
+    runners =
     let
       fun loop [] acc = acc
         | loop (runner :: rest) acc =
@@ -187,7 +223,7 @@ struct
               else loop rest newAcc
             end
       val runs = loop runners []
-      val report = runreport seed runs
+      val report = runreport seed counts runs
     in
       ( List.app
           (fn {result, passed} =>
@@ -201,38 +237,41 @@ struct
 
   fun runWithConfig options test =
     let
-      val {output, printPassed, stopOnFirstFailure, executionOrder} = Configuration.fromList options
+      val {output, printPassed, stopOnFirstFailure, executionOrder} =
+        Configuration.fromList options
 
       val runners = let open Configuration in fromTest test end
 
-      fun runWithOrder rs =
+      fun runWithOrder {runners, skipped, focused} =
         let
-          val (orderedRunners, seedOpt) = applyExecutionOrder executionOrder rs
+          val (orderedRunners, seedOpt) =
+            applyExecutionOrder executionOrder runners
         in
-          runtests output printPassed stopOnFirstFailure seedOpt orderedRunners
+          runtests output printPassed stopOnFirstFailure seedOpt
+            {skipped = skipped, focused = focused} orderedRunners
         end
     in
       case runners of
-        Plain rs =>
+        Plain result =>
           let
-            val report = runWithOrder rs
+            val report = runWithOrder result
             val _ = printreport output report
           in
             if (#failed report) > 0 then OS.Process.exit OS.Process.failure
             else OS.Process.exit OS.Process.success
           end
-      | Skipping rs =>
+      | Skipping result =>
           let
-            val report = runWithOrder rs
+            val report = runWithOrder result
             val _ = printreport output report
           in
             (* skipping a test should always fail all the tests *)
             OS.Process.exit OS.Process.failure
           end
 
-      | Focusing rs =>
+      | Focusing result =>
           let
-            val report = runWithOrder rs
+            val report = runWithOrder result
             val _ = printreport output report
           in
             (* focusing a test should always fail all the tests *)

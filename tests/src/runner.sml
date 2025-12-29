@@ -39,7 +39,7 @@ struct
                   val expected = 2
                   val actual =
                     case runners of
-                      Focusing rs => List.length rs
+                      Focusing {runners, ...} => List.length runners
                     | _ => 0
                 in
                   (Expect.equalFmt Int.compare Int.toString expected actual)
@@ -60,7 +60,7 @@ struct
                   val expected = 1
                   val actual =
                     case runners of
-                      Focusing rs => List.length rs
+                      Focusing {runners, ...} => List.length runners
                     | _ => 0
                 in
                   (Expect.equalFmt Int.compare Int.toString expected actual)
@@ -81,30 +81,36 @@ struct
                   val expected = 1
                   val actual =
                     case runners of
-                      Skipping rs => List.length rs
+                      Skipping {runners, ...} => List.length runners
                     | _ => 0
                 in
                   (Expect.equalFmt Int.compare Int.toString expected actual)
                 end)
             ]
         , describe "runtests"
-            [ test "stops on first failure when stopOnFirstFailure is true" (fn _ =>
-                let
-                  val output = TextIO.openOut "/dev/null"
-                  val tests = describe "three tests"
-                    [ test "first fails" (fn _ => Expect.fail "first failure")
-                    , test "second fails" (fn _ => Expect.fail "second failure")
-                    , test "third fails" (fn _ => Expect.fail "third failure")
-                    ]
-                  val runners =
-                    case fromTest tests of
-                      Plain rs => rs
-                    | _ => []
-                  val report = runtests output false true NONE runners
-                  val _ = TextIO.closeOut output
-                in
-                  Expect.equalFmt Int.compare Int.toString 1 (#failed report)
-                end)
+            [ test "stops on first failure when stopOnFirstFailure is true"
+                (fn _ =>
+                   let
+                     val output = TextIO.openOut "/dev/null"
+                     val tests = describe "three tests"
+                       [ test "first fails" (fn _ =>
+                           Expect.fail "first failure")
+                       , test "second fails" (fn _ =>
+                           Expect.fail "second failure")
+                       , test "third fails" (fn _ =>
+                           Expect.fail "third failure")
+                       ]
+                     val runners =
+                       case fromTest tests of
+                         Plain {runners, ...} => runners
+                       | _ => []
+                     val report =
+                       runtests output false true NONE
+                         {skipped = 0, focused = 0} runners
+                     val _ = TextIO.closeOut output
+                   in
+                     Expect.equalFmt Int.compare Int.toString 1 (#failed report)
+                   end)
             , test "runs all tests when stopOnFirstFailure is false" (fn _ =>
                 let
                   val output = TextIO.openOut "/dev/null"
@@ -115,9 +121,11 @@ struct
                     ]
                   val runners =
                     case fromTest tests of
-                      Plain rs => rs
+                      Plain {runners, ...} => runners
                     | _ => []
-                  val report = runtests output false false NONE runners
+                  val report =
+                    runtests output false false NONE {skipped = 0, focused = 0}
+                      runners
                   val _ = TextIO.closeOut output
                 in
                   Expect.equalFmt Int.compare Int.toString 3 (#failed report)

@@ -11,6 +11,37 @@ sig
   val focus: test -> test
   val concat: test list -> test
 
+  val fuzz: string -> 'a Fuzz.t -> ('a -> Expectation.Expectation) -> test
+  val fuzz2: string
+             -> 'a Fuzz.t
+             -> 'b Fuzz.t
+             -> ('a -> 'b -> Expectation.Expectation)
+             -> test
+  val fuzz3: string
+             -> 'a Fuzz.t
+             -> 'b Fuzz.t
+             -> 'c Fuzz.t
+             -> ('a -> 'b -> 'c -> Expectation.Expectation)
+             -> test
+  val fuzzWith: int
+                -> string
+                -> 'a Fuzz.t
+                -> ('a -> Expectation.Expectation)
+                -> test
+  val fuzz2With: int
+                 -> string
+                 -> 'a Fuzz.t
+                 -> 'b Fuzz.t
+                 -> ('a -> 'b -> Expectation.Expectation)
+                 -> test
+  val fuzz3With: int
+                 -> string
+                 -> 'a Fuzz.t
+                 -> 'b Fuzz.t
+                 -> 'c Fuzz.t
+                 -> ('a -> 'b -> 'c -> Expectation.Expectation)
+                 -> test
+
   val run: test -> unit
   val runWithConfig: Configuration.Setting list -> test -> unit
 end
@@ -127,6 +158,32 @@ struct
           in
             failnow {description = description, reason = Invalid DuplicatedName}
           end
+
+  val defaultFuzzRuns = 100
+
+  fun fuzzWith runs description gen testFn =
+    let
+      val desc = String.trim description
+    in
+      if desc = "" then blankDescriptionFail
+      else Labeled (desc, UnitTest (fn () => Fuzz.run runs gen testFn))
+    end
+
+  fun fuzz description gen testFn =
+    fuzzWith defaultFuzzRuns description gen testFn
+
+  fun fuzz2With runs description genA genB testFn =
+    fuzzWith runs description (Fuzz.pair genA genB) (fn (a, b) => testFn a b)
+
+  fun fuzz2 description genA genB testFn =
+    fuzz2With defaultFuzzRuns description genA genB testFn
+
+  fun fuzz3With runs description genA genB genC testFn =
+    fuzzWith runs description (Fuzz.triple genA genB genC) (fn (a, b, c) =>
+      testFn a b c)
+
+  fun fuzz3 description genA genB genC testFn =
+    fuzz3With defaultFuzzRuns description genA genB genC testFn
 
   val run = Runner.run
   val runWithConfig = Runner.runWithConfig

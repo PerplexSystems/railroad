@@ -23,4 +23,5 @@ src/expect.sml
 src/runner.sml
 src/random.sml
 src/execution-order.sml
+src/fuzz.sml
 src/main.sml

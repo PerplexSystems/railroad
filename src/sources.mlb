@@ -4,6 +4,7 @@ configuration.sml
 expectation.sml
 internal.sml
 runner.sml
+fuzz.sml
 test.sml
 expect.sml
 railroad.sml

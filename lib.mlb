@@ -4,6 +4,7 @@ in
   signature CONFIGURATION
   signature TEST
   signature EXPECT
+  signature FUZZ
   signature RAILROAD
 
   structure Railroad

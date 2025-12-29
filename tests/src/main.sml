@@ -26,6 +26,7 @@ struct
         , TestExpectation.tests
         , TestRandom.tests
         , TestExecutionOrder.tests
+        , TestFuzz.tests
         ])
     end
 end

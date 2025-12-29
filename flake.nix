@@ -42,7 +42,7 @@
                   # compilers
                   mlton
                   lunarml
-                  lua
+                  lua5_3_compat
 
                   # tools
                   millet

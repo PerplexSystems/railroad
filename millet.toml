@@ -1,2 +1,5 @@
 version = 1
-workspace.root = "src/sources.mlb"
+
+# workspace.root = "src/sources.mlb"
+workspace.root = "tests/tests.mlb"
+

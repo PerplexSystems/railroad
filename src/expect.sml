@@ -9,6 +9,8 @@ sig
   val pass: Expectation.Expectation
   val fail: string -> Expectation.Expectation
   val onFail: string -> Expectation.Expectation -> Expectation.Expectation
+  val all: Expectation.Expectation list -> Expectation.Expectation
+  val any: Expectation.Expectation list -> Expectation.Expectation
 
   val isTrue: bool actual -> Expectation.Expectation
   val isFalse: bool actual -> Expectation.Expectation
@@ -89,6 +91,32 @@ struct
     case expectation of
       Pass => expectation
     | Fail _ => fail str
+
+  fun all expectations =
+    case expectations of
+      [] => Expectation.fail
+        { description = "Expect.all"
+        , reason = Equality "Expect.all requires at least one expectation."
+        }
+    | _ =>
+        case List.find (fn e => e <> Pass) expectations of
+          NONE => Pass
+        | SOME failure => failure
+
+  fun any expectations =
+    case expectations of
+      [] => Expectation.fail
+        { description = "Expect.any"
+        , reason = Equality "Expect.any requires at least one expectation."
+        }
+    | _ =>
+        if List.exists (fn e => e = Pass) expectations then
+          Pass
+        else
+          Expectation.fail
+            { description = "Expect.any"
+            , reason = Equality "None of the expectations passed."
+            }
 
   fun isTrue actual =
     if actual then

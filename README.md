@@ -16,15 +16,15 @@ along with a built-in test runner.
 ## Installation
 
 ```sh
-$ git clone https://github.com/PerplexSystems/railroad.git $YOUR_PROJECT/vendor/Railroad
+$ git clone https://github.com/PerplexSystems/railroad.git $YOUR_PROJECT/vendor/railroad
 ```
 
-Then reference `vendor/railroad/sources.mlb` on your project's `.mlb`
+Then reference `vendor/railroad/lib.mlb` on your project's `.mlb`
 file. Example:
 
 ```sml
 $(SML_LIB)/basis/basis.mlb
-lib/railroad/sources.mlb
+vendor/railroad/lib.mlb
 main.sml
 ```
 
@@ -66,6 +66,8 @@ Check out the table of contents below for more information:
     - [pass](#pass)
     - [fail](#fail)
     - [onFail](#onfail)
+    - [all](#all)
+    - [any](#any)
     - [isTrue](#istrue)
     - [isFalse](#isfalse)
     - [some](#some)
@@ -302,9 +304,41 @@ custom one.
 
 ```sml
 test "sum" (fn _ =>
-  Expect.onFail 
-    "this shouldn't be failing" 
+  Expect.onFail
+    "this shouldn't be failing"
     (Expect.equal Int.compare 4 (2 + 2)))
+```
+
+### all
+
+`val all: Expectation list -> Expectation`
+
+Passes if all of the given expectations pass. If any expectation fails,
+returns the first failure.
+
+```sml
+test "value is within range" (fn _ =>
+  (* ... *)
+  Expect.all
+    [ Expect.atLeast Int.compare 0 value
+    , Expect.atMost Int.compare 100 value
+    ])
+```
+
+### any
+
+`val any: Expectation list -> Expectation`
+
+Passes if at least one of the given expectations passes. If all
+expectations fail, the test fails.
+
+```sml
+test "value is either negative or greater than 10" (fn _ =>
+  (* ... *)
+  Expect.any
+    [ Expect.less Int.compare 0 value
+    , Expect.greater Int.compare 10 value
+    ])
 ```
 
 ### isTrue

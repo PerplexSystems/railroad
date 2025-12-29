@@ -57,6 +57,47 @@ struct
         , test "greater" (fn _ => Expect.greater Int.compare 1 2)
         , test "greaterFmt" (fn _ =>
             Expect.greaterFmt Int.compare Int.toString 1 2)
+        , describe "all"
+            [ test "passes when all expectations pass" (fn _ =>
+                Expect.all
+                  [ Expect.pass
+                  , Expect.isTrue true
+                  , Expect.equal Int.compare 1 1
+                  ])
+            , test "fails when one expectation fails" (fn _ =>
+                expectToFail (Expect.all
+                  [ Expect.pass
+                  , Expect.fail "this fails"
+                  , Expect.pass
+                  ]))
+            , test "fails when all expectations fail" (fn _ =>
+                expectToFail (Expect.all
+                  [ Expect.fail "first"
+                  , Expect.fail "second"
+                  ]))
+            , test "fails with empty list" (fn _ =>
+                expectToFail (Expect.all []))
+            ]
+        , describe "any"
+            [ test "passes when all expectations pass" (fn _ =>
+                Expect.any
+                  [ Expect.pass
+                  , Expect.pass
+                  ])
+            , test "passes when one expectation passes" (fn _ =>
+                Expect.any
+                  [ Expect.fail "this fails"
+                  , Expect.pass
+                  , Expect.fail "this also fails"
+                  ])
+            , test "fails when all expectations fail" (fn _ =>
+                expectToFail (Expect.any
+                  [ Expect.fail "first"
+                  , Expect.fail "second"
+                  ]))
+            , test "fails with empty list" (fn _ =>
+                expectToFail (Expect.any []))
+            ]
         ]
     end
 end
